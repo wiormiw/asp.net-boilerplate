@@ -2,12 +2,12 @@ namespace Application.Common.Contracts.Api;
 
 public class Result
 {
-    public bool IsSuccess { get; init; }
+    public bool Succeeded { get; init; }
     public string[] Errors { get; init; }
 
-    internal Result(bool isSuccess, IEnumerable<string> errors)
+    internal Result(bool succeeded, IEnumerable<string> errors)
     {
-        IsSuccess = isSuccess;
+        Succeeded = succeeded;
         Errors = errors.ToArray();
     }
 
