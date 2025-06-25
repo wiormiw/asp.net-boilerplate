@@ -7,8 +7,4 @@ public class AuthorizeAttribute : Attribute
     
     // Uncomment this if you want policy based authorization.
     // public string Policies { get; set; } = string.Empty;
-    
-    public AuthorizeAttribute()
-    {
-    }
 }

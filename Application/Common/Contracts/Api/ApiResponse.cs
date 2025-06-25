@@ -15,5 +15,5 @@ public class ApiErrorResponse
     public bool Success { get; init; } = false;
     public int StatusCode { get; init; }
     public string? Type { get; init; }
-    public List<string> Messages { get; init; } = new();
+    public List<string> Messages { get; init; } = [];
 }

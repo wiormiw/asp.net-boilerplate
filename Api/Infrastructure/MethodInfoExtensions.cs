@@ -4,7 +4,7 @@ namespace Api.Infrastructure;
 
 public static class MethodInfoExtensions
 {
-    public static bool IsAnonymous(this MethodInfo method)
+    private static bool IsAnonymous(this MethodInfo method)
     {
         var invalidChars = new[] {'<', '>'};
         return method.Name.IndexOfAny(invalidChars) >= 0;

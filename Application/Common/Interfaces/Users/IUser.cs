@@ -1,6 +1,6 @@
 namespace Application.Common.Interfaces.Users;
 
-public class IUser
+public interface IUser
 {
     public string? Id { get; }
     public string? Email { get; }
