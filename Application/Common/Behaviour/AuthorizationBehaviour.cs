@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Application.Common.Interfaces.Users;
 using Application.Common.Security;
 
@@ -8,6 +9,7 @@ public class AuthorizationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRe
 {
     private readonly IUser _user;
     private readonly IIdentityService _identityService;
+    private static readonly ConcurrentDictionary<Type, AuthorizeAttribute[]> _attributeCache = new();
     
     public AuthorizationBehaviour(IUser user, IIdentityService identityService) 
     {
@@ -18,15 +20,20 @@ public class AuthorizationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRe
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        var authorizeAttributes = Attribute.GetCustomAttributes(
-                request.GetType(), typeof(AuthorizeAttribute), inherit: true)
-            .Cast<AuthorizeAttribute>()
-            .ToArray();
-        
-        if (!authorizeAttributes.Any())
+        if (request.GetType().IsDefined(typeof(AllowAnonymousAttribute), true))
             return await next(cancellationToken);
         
-        if (_user.Id is null)
+        var authorizeAttributes = _attributeCache.GetOrAdd(
+            request.GetType(),
+            type => type.GetCustomAttributes(typeof(AuthorizeAttribute), true)
+                .OfType<AuthorizeAttribute>()
+                .ToArray()
+        );
+        
+        if (authorizeAttributes.Length == 0)
+            return await next(cancellationToken);
+        
+        if (string.IsNullOrEmpty(_user.Id))
             throw new UnauthorizedAccessException();
         
         // RBAC
@@ -34,12 +41,11 @@ public class AuthorizationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRe
             .Where(a => !string.IsNullOrWhiteSpace(a.Roles))
             .ToArray();
 
-        if (rolesAttributes.Any())
+        if (rolesAttributes.Length > 0)
         {
             var requiredRoles = rolesAttributes
-                .SelectMany(a => 
-                    a.Roles.Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
-                .Distinct();
+                .SelectMany(a => a.Roles.Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+                .ToHashSet();
 
             var isAuthorized = false;
             foreach (var role in requiredRoles)
