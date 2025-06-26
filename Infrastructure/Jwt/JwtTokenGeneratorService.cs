@@ -78,33 +78,6 @@ public class JwtTokenGeneratorService : ITokenGeneratorService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
     
-    public ClaimsPrincipal? ValidateAccessToken(string token)
-    {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!);
-
-        try
-        {
-            var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidIssuer = _configuration["Jwt:Issuer"],
-                ValidAudience = _configuration["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(key),
-                ValidateIssuerSigningKey = true,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
-            }, out _);
-            
-            return principal;
-        }
-        catch
-        {
-            return null;
-        }
-    }
-    
     public ClaimsPrincipal? ValidateRefreshToken(string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
