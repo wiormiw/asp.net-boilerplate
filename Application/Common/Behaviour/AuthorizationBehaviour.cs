@@ -30,7 +30,7 @@ public class AuthorizationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRe
                 .ToArray()
         );
         
-        if (authorizeAttributes.Length == 0)
+        if (authorizeAttributes is [])
             return await next(cancellationToken);
         
         if (string.IsNullOrEmpty(_user.Id))
