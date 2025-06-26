@@ -23,12 +23,15 @@ public class LoggingBehaviour<TRequest> : IRequestPreProcessor<TRequest>
     {
         var requestName =  typeof(TRequest).Name;
         var userId =  _user.Id;
-        string? userName = string.Empty;
+        var userName = string.Empty;
 
         if (!string.IsNullOrEmpty(userId))
-            userName = await _identityService.GetUserNameAsync(userId);
+            userName = await _identityService.GetUserNameAsync(userId) ?? "N/A";
         
-        _logger.LogInformation("Request: {Name} {@UserId} {@UserName} {@Request}",
-            requestName, userId, userName, request);
+        _logger.LogInformation("Handling Request: {RequestName} (User: {UserId} / {UserName}) {@RequestPayload}",
+            requestName,
+            string.IsNullOrEmpty(userId) ? "Anonymous" : userId,
+            string.IsNullOrEmpty(userName) ? "Anonymous" : userName,
+            request);
     }
 }
