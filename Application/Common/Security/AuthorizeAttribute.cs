@@ -1,6 +1,6 @@
 namespace Application.Common.Security;
 
-[AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 public class AuthorizeAttribute : Attribute
 {
     public string Roles { get; set; } = string.Empty;
