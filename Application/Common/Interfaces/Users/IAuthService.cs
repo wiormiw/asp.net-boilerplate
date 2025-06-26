@@ -9,7 +9,8 @@ public interface IAuthService
     Task<(Result Result, AuthResponse Data)> LoginAsync(LoginRequest request);
     Task<(Result Result, AuthResponse Data)> RefreshTokenAsync(RefreshTokenRequest request);
     Task<Result> ChangePasswordAsync(ChangePasswordRequest request);
-    Task<Result> VerifyEmail(string userId, string token);
-    Task<Result> SendPasswordResetEmailAsync(ResetPasswordRequest request);
-    Task<(Result Result, ResetPasswordResponse Data)> OneClickPasswordResetAsync(OneClickPasswordResetRequest request); 
+    // Implement all of this if needed!
+    // Task<Result> VerifyEmail(string userId, string token);
+    // Task<Result> SendPasswordResetEmailAsync(ResetPasswordRequest request);
+    // Task<(Result Result, ResetPasswordResponse Data)> OneClickPasswordResetAsync(OneClickPasswordResetRequest request); 
 }
