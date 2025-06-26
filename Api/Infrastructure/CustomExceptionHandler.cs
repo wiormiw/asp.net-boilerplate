@@ -8,10 +8,11 @@ public class CustomExceptionHandler : IExceptionHandler
 {
     private static readonly Dictionary<Type, Func<HttpContext, Exception, Task>> Handlers = new()
     {
-        { typeof(NotFoundException), HandleNotFound },
-        { typeof(ValidationException), HandleValidationException },
-        { typeof(UnauthorizedAccessException), HandleUnauthorizedException },
-        { typeof(ForbiddenAccessException), HandleForbiddenAccessException },
+        [typeof(NotFoundException)] = HandleNotFoundAsync,
+        [typeof(ValidationException)] = HandleValidationExceptionAsync,
+        [typeof(ArgumentNullException)] = HandleArgumentNotNullExceptionAsync,
+        [typeof(UnauthorizedAccessException)] = HandleUnauthorizedAccessExceptionAsync,
+        [typeof(ForbiddenAccessException)] = HandleForbiddenAccessExceptionAsync,
     };
 
     public async ValueTask<bool> TryHandleAsync(HttpContext context, Exception exception,
@@ -24,11 +25,11 @@ public class CustomExceptionHandler : IExceptionHandler
             await handler(context, exception);
             return true;
         }
-
+        
         return false;
     }
     
-    private static async Task HandleNotFound(HttpContext context, Exception ex)
+    private static async Task HandleNotFoundAsync(HttpContext context, Exception ex)
     {
         var exception = (NotFoundException) ex;
 
@@ -44,7 +45,7 @@ public class CustomExceptionHandler : IExceptionHandler
         await context.Response.WriteAsJsonAsync(error);
     }
 
-    private static async Task HandleValidationException(HttpContext context, Exception ex)
+    private static async Task HandleValidationExceptionAsync(HttpContext context, Exception ex)
     {
         var exception = (ValidationException) ex;
         
@@ -64,7 +65,23 @@ public class CustomExceptionHandler : IExceptionHandler
         await context.Response.WriteAsJsonAsync(error);
     }
 
-    private static async Task HandleUnauthorizedException(HttpContext context, Exception ex)
+    private static async Task HandleArgumentNotNullExceptionAsync(HttpContext context, Exception ex)
+    {
+        var exception = (ArgumentException) ex;
+
+        var error = new ApiErrorResponse
+        {
+            StatusCode = StatusCodes.Status400BadRequest,
+            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+            Messages = ["There's empty required fields."]
+        };
+        
+        context.Response.StatusCode = StatusCodes.Status400BadRequest;
+        
+        await context.Response.WriteAsJsonAsync(error);
+    }
+
+    private static async Task HandleUnauthorizedAccessExceptionAsync(HttpContext context, Exception ex)
     {
         var error = new ApiErrorResponse
         {
@@ -78,7 +95,7 @@ public class CustomExceptionHandler : IExceptionHandler
         await context.Response.WriteAsJsonAsync(error);
     }
 
-    private static async Task HandleForbiddenAccessException(HttpContext context, Exception ex)
+    private static async Task HandleForbiddenAccessExceptionAsync(HttpContext context, Exception ex)
     {
         var error = new ApiErrorResponse
         {
