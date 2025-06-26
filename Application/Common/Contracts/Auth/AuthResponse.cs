@@ -2,5 +2,5 @@ namespace Application.Common.Contracts.Auth;
 
 public record AuthResponse(
     string AccessToken,
-    string ExpiresIn,
+    int ExpiresIn,
     string RefreshToken);
