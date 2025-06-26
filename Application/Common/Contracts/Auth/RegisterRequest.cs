@@ -1,7 +1,7 @@
 namespace Application.Common.Contracts.Auth;
 
 public record RegisterRequest(
-    string Username,
+    string UserName,
     string Email,
     string Password,
     string FirstName,
