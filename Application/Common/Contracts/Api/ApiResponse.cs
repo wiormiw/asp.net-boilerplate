@@ -21,7 +21,7 @@ public class ApiErrorResponse
     public static ApiErrorResponse FromStatus(int statusCode, string?  type = null, params string[] messages)
         => new() { StatusCode = statusCode, Type = type, Messages = messages.ToList() };
 
-    public static ApiErrorResponse FromValidation(int statusCode, string? type, Dictionary<string, string[]> errors)
+    public static ApiErrorResponse FromValidation(int statusCode, string? type, IDictionary<string, string[]> errors)
     {
         var allMessages = errors
             .SelectMany(kvp => 
