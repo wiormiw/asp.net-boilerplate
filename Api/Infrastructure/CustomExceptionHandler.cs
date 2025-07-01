@@ -32,13 +32,12 @@ public class CustomExceptionHandler : IExceptionHandler
     private static async Task HandleNotFoundAsync(HttpContext context, Exception ex)
     {
         var exception = (NotFoundException) ex;
-
-        var error = new ApiErrorResponse
-        {
-            StatusCode = StatusCodes.Status404NotFound,
-            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.4",
-            Messages = [exception.Message]
-        };
+        
+        var error = ApiErrorResponse.FromStatus(
+            StatusCodes.Status404NotFound,
+            "https://tools.ietf.org/html/rfc7231#section-6.5.4",
+            exception.Message
+        );
             
         context.Response.StatusCode = StatusCodes.Status404NotFound;
         
@@ -49,16 +48,11 @@ public class CustomExceptionHandler : IExceptionHandler
     {
         var exception = (ValidationException) ex;
         
-        var allMessages = exception.Errors
-            .SelectMany(kvp => kvp.Value.Select(msg => $"{kvp.Key}: {msg}"))
-            .ToList();
-
-        var error = new ApiErrorResponse
-        {
-            StatusCode = StatusCodes.Status400BadRequest,
-            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-            Messages = allMessages
-        };
+        var error = ApiErrorResponse.FromValidation(
+            StatusCodes.Status400BadRequest,
+            "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+            exception.Errors
+        );
         
         context.Response.StatusCode = StatusCodes.Status400BadRequest;
         
@@ -69,12 +63,12 @@ public class CustomExceptionHandler : IExceptionHandler
     {
         var exception = (ArgumentException) ex;
 
-        var error = new ApiErrorResponse
-        {
-            StatusCode = StatusCodes.Status400BadRequest,
-            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-            Messages = ["There's empty required fields."]
-        };
+        var error = ApiErrorResponse.FromStatus
+        (
+            StatusCodes.Status400BadRequest,
+            "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+            "There's empty required fields."
+        );
         
         context.Response.StatusCode = StatusCodes.Status400BadRequest;
         
@@ -83,12 +77,12 @@ public class CustomExceptionHandler : IExceptionHandler
 
     private static async Task HandleUnauthorizedAccessExceptionAsync(HttpContext context, Exception ex)
     {
-        var error = new ApiErrorResponse
-        {
-            StatusCode = StatusCodes.Status401Unauthorized,
-            Type = "https://tools.ietf.org/html/rfc7235#section-3.1",
-            Messages = ["Unauthorized, please log in to access resources."]
-        };
+        var error = ApiErrorResponse.FromStatus
+        (
+            StatusCodes.Status401Unauthorized,
+            "https://tools.ietf.org/html/rfc7235#section-3.1",
+            "Unauthorized, please log in to access resources."
+        );
         
         context.Response.StatusCode = StatusCodes.Status401Unauthorized;
         
@@ -97,12 +91,12 @@ public class CustomExceptionHandler : IExceptionHandler
 
     private static async Task HandleForbiddenAccessExceptionAsync(HttpContext context, Exception ex)
     {
-        var error = new ApiErrorResponse
-        {
-            StatusCode = StatusCodes.Status403Forbidden,
-            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.3",
-            Messages = ["Forbidden, you are not allowed to access resources."]
-        };
+        var error = ApiErrorResponse.FromStatus
+        (
+            StatusCodes.Status403Forbidden,
+            "https://tools.ietf.org/html/rfc7231#section-6.5.3",
+            "Forbidden, you are not allowed to access resources."
+        );
         
         context.Response.StatusCode = StatusCodes.Status403Forbidden;
         
